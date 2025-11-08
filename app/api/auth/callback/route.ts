@@ -16,7 +16,13 @@ export async function GET(request: NextRequest) {
   try {
     const clientId = process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID
     const clientSecret = process.env.NEXT_PUBLIC_STRAVA_CLIENT_SECRET
-    const redirectUri = process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI || 'http://localhost:3000/api/auth/callback'
+    // Construct redirect URI from request origin
+    const origin = request.nextUrl.origin
+    const redirectUri = process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI || `${origin}/api/auth/callback`
+    
+    if (!clientId || !clientSecret) {
+      throw new Error('Strava credentials not configured')
+    }
 
     // Exchange authorization code for access token
     const tokenResponse = await fetch('https://www.strava.com/oauth/token', {

@@ -19,10 +19,17 @@ export default function Home() {
 
   const handleAuthorize = () => {
     const clientId = process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID
-    const redirectUri = process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI || 'http://localhost:3000/api/auth/callback'
+    // Get redirect URI from env or construct from current origin
+    const redirectUri = process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI || 
+      (typeof window !== 'undefined' ? `${window.location.origin}/api/auth/callback` : 'http://localhost:3000/api/auth/callback')
     const scope = 'read,activity:read'
     const responseType = 'code'
     const approvalPrompt = 'force'
+    
+    if (!clientId) {
+      alert('Strava Client ID tidak dikonfigurasi. Silakan hubungi administrator.')
+      return
+    }
     
     const authUrl = `https://www.strava.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=${responseType}&scope=${scope}&approval_prompt=${approvalPrompt}`
     
